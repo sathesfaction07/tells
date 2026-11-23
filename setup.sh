@@ -2,7 +2,7 @@
 set -e
 
 # ─────────────────────────────────────────────────────────────────────────────
-# EvasionDetect Setup Script
+# Tells Setup Script
 # Detects OS, creates/reuses virtual environment, installs dependencies.
 # No cloud provisioning needed — this tool runs locally against a running
 # Chrome instance.
@@ -56,21 +56,21 @@ setup_venv() {
 run_app() {
     echo ""
     echo "═══════════════════════════════════════════════════════════════"
-    echo "  EvasionDetect is ready."
+    echo "  Tells is ready."
     echo ""
     echo "  Prerequisites:"
     echo "    Chrome running with: google-chrome --remote-debugging-port=9222"
     echo ""
     echo "  Usage:"
-    echo "    evasion-detect products.csv --output results/"
-    echo "    evasion-detect products.csv --llm --brief --output results/"
+    echo "    tells products.csv --output results/"
+    echo "    tells products.csv --llm --brief --output results/"
     echo "═══════════════════════════════════════════════════════════════"
 }
 
 main() {
     echo ""
     echo "╔═══════════════════════════════════════════════════════════════╗"
-    echo "║            EvasionDetect — Setup                             ║"
+    echo "║            Tells — Setup                             ║"
     echo "╚═══════════════════════════════════════════════════════════════╝"
     echo ""
     detect_os

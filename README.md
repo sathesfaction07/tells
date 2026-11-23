@@ -1,4 +1,4 @@
-# EvasionDetect
+# Tells
 
 Detects evasive behavior in product listings by correlating signals from multiple data sources — annotation status transitions and image change history — into a weighted confidence score. Uses Chrome DevTools Protocol (CDP) for passive data collection from a running browser session.
 
@@ -14,7 +14,7 @@ The challenge: this data lives across multiple disconnected systems. No single p
 
 ## How It Works
 
-EvasionDetect attaches to a running Chrome instance (via CDP) and queries two independent data sources in parallel:
+Tells attaches to a running Chrome instance (via CDP) and queries two independent data sources in parallel:
 
 **Annotation Source** — fetches the status transition history for a product over the past 364 days. Looks for specific patterns:
 - Approval → Restricted (a reversal — something changed after initial approval)
@@ -39,7 +39,7 @@ The final score maps to a verdict: HIGH (≥70) = recommend investigation, MEDIU
 ## Architecture
 
 ```
-evasion-detect <product_id>
+tells <product_id>
        │
        ├─────────────────────────────────────────┐
        │                                         │
@@ -73,7 +73,7 @@ Both sources run concurrently via `asyncio.gather`. If one source fails (timeout
 ## Project Structure
 
 ```
-evasion-detect/
+tells/
 ├── src/evasion_detect/
 │   ├── cli.py                  Click entry point with Rich table output
 │   ├── core/
@@ -100,16 +100,16 @@ google-chrome --remote-debugging-port=9222 &
 
 # Analyze a single product
 pip install -e .
-evasion-detect product_ids.txt
+tells product_ids.txt
 
 # Batch from CSV (ranked by confidence in output)
-evasion-detect products.csv --output results/
+tells products.csv --output results/
 
 # With LLM reasoning for ambiguous cases
-evasion-detect products.csv --llm --output results/
+tells products.csv --llm --output results/
 
 # Generate investigation briefs (one markdown file per product)
-evasion-detect products.csv --llm --brief --output results/
+tells products.csv --llm --brief --output results/
 ```
 
 Input can be a CSV (with `product_id` column), a text file (one ID per line), or a single ID.

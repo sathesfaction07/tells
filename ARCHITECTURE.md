@@ -1,8 +1,8 @@
-# EvasionDetect — Technical Architecture
+# Tells — Technical Architecture
 
 ## Overview
 
-EvasionDetect is a multi-signal behavior analysis tool that correlates annotation status transitions and image change history to detect evasive merchant behavior patterns. It attaches to a running Chrome browser via the Chrome DevTools Protocol (CDP), queries internal platform APIs through intercepted network requests, applies pattern detection to annotation and image signals, computes weighted confidence scores, and optionally invokes AWS Bedrock Claude for reasoning on ambiguous cases.
+Tells is a multi-signal behavior analysis tool that correlates annotation status transitions and image change history to detect evasive merchant behavior patterns. It attaches to a running Chrome browser via the Chrome DevTools Protocol (CDP), queries internal platform APIs through intercepted network requests, applies pattern detection to annotation and image signals, computes weighted confidence scores, and optionally invokes AWS Bedrock Claude for reasoning on ambiguous cases.
 
 **Design principle:** Evidence presentation, not enforcement. The system flags suspicious patterns and assembles investigation-ready timelines. Human investigators make the final call.
 
@@ -14,7 +14,7 @@ EvasionDetect is a multi-signal behavior analysis tool that correlates annotatio
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                              CLI ENTRY                                    │
 │                                                                         │
-│  evasion-detect <input>  [--chrome-port 9222] [--days 364]                │
+│  tells <input>  [--chrome-port 9222] [--days 364]                │
 │                         [--llm] [--brief] [--output DIR]                │
 │                                                                         │
 │  Input formats:  CSV (product_id column)                                 │
@@ -199,7 +199,7 @@ Sources run concurrently via `asyncio.gather(*tasks, return_exceptions=True)`. E
 ## Data Flow
 
 ```
-1. User runs: evasion-detect products.csv --llm --brief --output results/
+1. User runs: tells products.csv --llm --brief --output results/
 2. CLI parses CSV, extracts product IDs from "product_id" column (or "id"/"sku")
 3. For each product ID:
    a. Analyzer computes cutoff date = now - 364 days
@@ -256,7 +256,7 @@ Initially, analyzer failure on any source error killed the entire analysis. A fl
 A merchant legitimately rebranding — new logo, new product photos, updated attributes — will trigger image change patterns. If they were also under review during the rebrand (approved, then re-reviewed for unrelated reasons and restricted), annotation patterns might fire. This is why the system reports evidence, not verdicts. The investigator sees "1x approval reversal, 1x full swap" and can check: did the merchant notify the platform of a rebrand? Are the new images consistent with the brand evolution? The scoring creates signal-to-noise separation; human context makes the call.
 
 **Why CDP over Playwright (ADR-001)**
-Playwright wants to own the browser lifecycle — it launches Chrome, controls navigation, manages page state. In this use case, the user is already logged into platform tools in their browser. We need to passively intercept network requests from that live session without disrupting workflow. CDP lets us attach to a running Chrome instance (via `--remote-debugging-port`) and observe API responses without injecting a proxy or spawning a new session. The tradeoff: manual WebSocket lifecycle management (connect, keepalive, reconnect on drop), but the payoff is zero user friction. An investigator already browsing the platform can run `evasion-detect` and the tool piggybacks on their active session.
+Playwright wants to own the browser lifecycle — it launches Chrome, controls navigation, manages page state. In this use case, the user is already logged into platform tools in their browser. We need to passively intercept network requests from that live session without disrupting workflow. CDP lets us attach to a running Chrome instance (via `--remote-debugging-port`) and observe API responses without injecting a proxy or spawning a new session. The tradeoff: manual WebSocket lifecycle management (connect, keepalive, reconnect on drop), but the payoff is zero user friction. An investigator already browsing the platform can run `tells` and the tool piggybacks on their active session.
 
 **364-day window, not 90 days or 1 year**
 Some evasion patterns are slow — a merchant might swap images 6 months after approval, betting that monitoring has moved on. 90 days misses these slow-burn patterns. 364 days (not 365) avoids crossing fiscal-year boundaries where platform policies may have changed, ensuring all analyzed events happened under consistent rules.
@@ -312,16 +312,16 @@ google-chrome --remote-debugging-port=9222 &
 pip install -e .
 
 # Single product
-evasion-detect SKU-12345
+tells SKU-12345
 
 # Batch from CSV (product_id column)
-evasion-detect products.csv --output results/
+tells products.csv --output results/
 
 # With LLM reasoning for ambiguous cases
-evasion-detect products.csv --llm --output results/
+tells products.csv --llm --output results/
 
 # Generate investigation briefs (markdown per product)
-evasion-detect products.csv --llm --brief --output results/
+tells products.csv --llm --brief --output results/
 
 # Output structure:
 #   results/

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "evasion-detect"
+name = "tells"
 version = "1.0.0"
 description = "Multi-signal evasive behavior detection via Chrome DevTools Protocol"
 requires-python = ">=3.11"
@@ -29,7 +29,7 @@ dev = [
 ]
 
 [project.scripts]
-evasion-detect = "evasion_detect.cli:main"
+tells = "evasion_detect.cli:main"
 
 [tool.ruff]
 target-version = "py311"
