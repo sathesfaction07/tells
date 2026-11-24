@@ -50,7 +50,7 @@ def generate_brief(result: dict, output_path: Path | None = None) -> str:
     if output_path:
         output_path.mkdir(parents=True, exist_ok=True)
         file_path = output_path / f"brief_{product_id}.md"
-        file_path.write_text(brief)
+        file_path.write_text(brief, encoding="utf-8")
         logger.info(f"Brief written to {file_path}")
 
     return brief

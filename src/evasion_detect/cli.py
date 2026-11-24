@@ -62,7 +62,7 @@ def main(
     if output_dir:
         out = Path(output_dir)
         out.mkdir(parents=True, exist_ok=True)
-        with open(out / "results.json", "w") as f:
+        with open(out / "results.json", "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, default=str)
         console.print(f"\n[dim]Results: {out / 'results.json'}[/dim]")
 
@@ -83,7 +83,7 @@ async def _run(
 
 def _load_input(path: Path) -> list[str]:
     if path.suffix == ".csv":
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             reader = csv.DictReader(f)
             return [
                 row.get("product_id") or row.get("id") or row.get("sku")
@@ -91,7 +91,7 @@ def _load_input(path: Path) -> list[str]:
                 if any(row.values())
             ]
 
-    text = path.read_text().strip()
+    text = path.read_text(encoding="utf-8").strip()
     if "\n" in text:
         return [line.strip() for line in text.splitlines() if line.strip()]
     return [text]
