@@ -56,3 +56,8 @@ source = ["src"]
 "src/evasion_detect/core/brief.py" = ["E501"]
 "src/evasion_detect/cli.py" = ["E501"]
 "tests/unit/test_brief.py" = ["E501"]
+
+[tool.hatch.build.targets.wheel]
+# The distribution is named "tells" but the import package keeps its original name, so hatchling
+# cannot find it by name and must be told where it is.
+packages = ["src/evasion_detect"]
